@@ -1,0 +1,32 @@
+package com.micahnyabuto.statussaver
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.micahnyabuto.statussaver.ui.navigation.AppNavHost
+import com.micahnyabuto.statussaver.ui.screens.home.HomeScreen
+import com.micahnyabuto.statussaver.ui.screens.splash.SplashScreen
+import com.micahnyabuto.statussaver.ui.theme.StatusSaverTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            StatusSaverTheme {
+                SplashScreen()
+                }
+            }
+
+        }
+}
+
+
