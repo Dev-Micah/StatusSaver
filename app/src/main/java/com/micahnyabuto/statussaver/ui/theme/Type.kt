@@ -1,34 +1,69 @@
 package com.micahnyabuto.statussaver.ui.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import com.micahnyabuto.statussaver.R
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+val productSan = FontFamily(
+    Font(R.font.product_sans_light, FontWeight.Light),
+    Font(R.font.product_sans_regular, FontWeight.Normal),
+    Font(R.font.product_sans_medium, FontWeight.Medium),
+    Font(R.font.product_sans_thin, FontWeight.Thin),
+    Font(R.font.product_sans_bold, FontWeight.Bold),
+    Font(R.font.product_sans_black, FontWeight.Black)
     )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+
+val Typography = Typography().run {
+    copy(
+        displayLarge = displayLarge.copy(
+            fontFamily = productSan
+        ),
+        displayMedium = displayMedium.copy(
+            fontFamily = productSan
+        ),
+        displaySmall = displaySmall.copy(
+            fontFamily = productSan
+        ),
+        headlineLarge = headlineLarge.copy(
+            fontFamily = productSan
+        ),
+        headlineMedium = headlineMedium.copy(
+            fontFamily = productSan
+        ),
+        headlineSmall = headlineSmall.copy(
+            fontFamily = productSan
+        ),
+        titleLarge = titleLarge.copy(
+            fontFamily = productSan,
+            fontWeight = FontWeight.Bold
+        ),
+        titleMedium = titleMedium.copy(
+            fontFamily = productSan,
+            fontWeight = FontWeight.Bold
+        ),
+        titleSmall = titleSmall.copy(
+            fontFamily = productSan,
+            fontWeight = FontWeight.Bold
+        ),
+        bodyLarge = bodyLarge.copy(
+            fontFamily = productSan
+        ),
+        bodyMedium = bodyMedium.copy(
+            fontFamily = productSan
+        ),
+        bodySmall = bodySmall.copy(
+            fontFamily = productSan
+        ),
+        labelLarge = labelLarge.copy(
+            fontFamily = productSan
+        ),
+        labelMedium = labelMedium.copy(
+            fontFamily = productSan
+        ),
+        labelSmall = labelSmall.copy(
+            fontFamily = productSan
+        ),
     )
-    */
-)
+}
