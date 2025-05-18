@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
 }
 
@@ -70,16 +73,27 @@ dependencies {
     //Appcompat
     implementation("androidx.appcompat:appcompat:1.6.1")
 
+    //Room
+    implementation("androidx.room:room-runtime:2.7.0")
+    implementation("androidx.room:room-ktx:2.7.0")
+    ksp("androidx.room:room-compiler:2.7.0")
+
+    //Hilt
+    ksp("com.google.dagger:hilt-compiler:2.48")
+    ksp("androidx.hilt:hilt-compiler:1.1.0")
+    implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
 
 //    //Coil
 //    implementation("io.coil-kt:coil-compose:2.7.0")
-//    implementation("io.coil-kt:coil-gif:2.5.0")
 
-//    //Exoplayer
+
+      //Exoplayer
 //    implementation("com.google.android.exoplayer:exoplayer-core:2.20.3")
 //    implementation("com.google.android.exoplayer:exoplayer-ui:2.20.3")
-//
-//    //Extended Material Icons
+
+    //Extended Material Icons
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
 
