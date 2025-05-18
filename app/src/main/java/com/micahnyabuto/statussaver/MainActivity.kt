@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route ?: Destinations.Home::class.qualifiedName.orEmpty()
 
-                // Show bottom navigation only when on....
+                // Don't Show bottom navigation only when on....
                 val showBottomNavigation = currentRoute !in listOf(
                     Destinations.Splash::class.qualifiedName,
 
@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         if (showBottomNavigation) {
                             Column {
-                                HorizontalDivider(thickness = 2.dp)
+                                HorizontalDivider(thickness = 1.dp)
                                 NavigationBar(
                                     tonalElevation = 0.dp,
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -110,8 +110,8 @@ class MainActivity : ComponentActivity() {
                                                 indicatorColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                                                     elevation = 0.dp
                                                 ),
-                                                selectedIconColor = MaterialTheme.colorScheme.secondary,
-                                                selectedTextColor = MaterialTheme.colorScheme.secondary,
+                                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                                selectedTextColor = MaterialTheme.colorScheme.primary,
                                                 unselectedIconColor = MaterialTheme.colorScheme.onSurface,
                                                 unselectedTextColor = MaterialTheme.colorScheme.onSurface
                                             )
