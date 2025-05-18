@@ -1,5 +1,6 @@
 package com.micahnyabuto.statussaver.ui.screens.videos
 
+import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,50 +23,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.micahnyabuto.statussaver.ui.screens.home.CategoriesBar
+import com.micahnyabuto.statussaver.ui.screens.home.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoScreen(
     navController: NavController
 ){
-    Scaffold (
-        topBar = {
-            Column(
-                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-            ) {
-                TopAppBar(
-
-                    title = { Text("Status Saver") },
-
-                    actions = {
-                        IconButton(
-                            onClick = {}
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
-                            )
-                        }
-                    },
-                    colors = TopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = White,
-                        navigationIconContentColor = White,
-                        actionIconContentColor = White,
-                        scrolledContainerColor = White
-                    )
-                )
-                CategoriesBar(
-                    navController = navController
-                )
-            }
-
-        }
-    ){ innerpadding ->
-        Box(modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center){
-            Text("VideoScreen")
-        }
+    TopBar(
+        navController =navController
+    )
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ){
+        Text("Videos Screen")
     }
 }
 @Preview(showBackground = true)

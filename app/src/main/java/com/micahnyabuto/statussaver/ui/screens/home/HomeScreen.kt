@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -64,6 +65,7 @@ fun CategoriesBar(
 ) {
     Row(
         modifier = Modifier
+            .height(50.dp)
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -92,12 +94,14 @@ fun TopBar(
     navController: NavController
 ){
     Scaffold (
-        topBar = {
-            Column(
-                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-            ) {
-                TopAppBar(
 
+        topBar = {
+            Column (
+                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+
+
+            ){
+                TopAppBar(
                     title = { Text("Status Saver") },
 
                     actions = {
@@ -107,6 +111,12 @@ fun TopBar(
                             Icon(
                                 imageVector = Icons.Default.Notifications,
                                 contentDescription = "Notifications"
+                            )
+                        }
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share App"
                             )
                         }
                     },
