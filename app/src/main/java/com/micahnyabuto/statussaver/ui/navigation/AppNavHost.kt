@@ -10,6 +10,7 @@ import com.micahnyabuto.statussaver.ui.screens.home.HomeScreen
 import com.micahnyabuto.statussaver.ui.screens.saved.SavedScreen
 import com.micahnyabuto.statussaver.ui.screens.settings.SettingsScreen
 import com.micahnyabuto.statussaver.ui.screens.splash.SplashScreen
+import com.micahnyabuto.statussaver.ui.screens.videos.VideoScreen
 
 @Composable
 fun AppNavHost(
@@ -45,6 +46,11 @@ fun AppNavHost(
         }
         composable <Destinations.Settings>{
             SettingsScreen(
+                navController =navController
+            )
+        }
+        composable <Destinations.Videos>{
+            VideoScreen(
                 navController =navController
             )
         }
