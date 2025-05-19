@@ -15,7 +15,7 @@ interface StatusDao {
     suspend fun insertAll(statusList: List<StatusEntity>)
 
     @Query("SELECT * FROM status ORDER BY dateSaved DESC")
-     fun getAllStatuses(): Flow<StatusEntity?>
+     fun getAllStatuses(): Flow<List<StatusEntity?>>
 
     @Query("DELETE FROM status WHERE id = :statusId")
     suspend fun deleteStatusById(statusId: Int)
