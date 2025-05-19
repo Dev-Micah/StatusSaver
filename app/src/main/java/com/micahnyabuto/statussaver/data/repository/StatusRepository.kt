@@ -13,7 +13,7 @@ import androidx.core.net.toUri
 interface StatusRepository {
     suspend fun fetchStatusesFromStorage(): List<StatusEntity>
     suspend fun saveStatus(status: StatusEntity)
-    fun getSavedStatus(): Flow<StatusEntity?>
+    fun getAllSavedStatus(): Flow<List<StatusEntity?>>
 }
 
 class StatusRepositoryImpl(
@@ -62,7 +62,7 @@ class StatusRepositoryImpl(
     }
 
 
-    override fun getSavedStatus(): Flow<StatusEntity?> {
+    override fun getAllSavedStatus(): Flow<List<StatusEntity?>> {
         return statusDao.getAllStatuses()
     }
 
