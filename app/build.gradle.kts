@@ -86,7 +86,7 @@ dependencies {
 
 
 //    //Coil
-//    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
 
       //Exoplayer
