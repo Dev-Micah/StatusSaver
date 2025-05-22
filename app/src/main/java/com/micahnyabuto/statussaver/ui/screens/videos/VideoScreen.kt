@@ -1,6 +1,5 @@
 package com.micahnyabuto.statussaver.ui.screens.videos
 
-import StatusViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +21,7 @@ import androidx.navigation.NavController
 import com.micahnyabuto.statussaver.ui.components.PermissionHandler
 import com.micahnyabuto.statussaver.ui.screens.home.StatusItem
 import com.micahnyabuto.statussaver.ui.screens.home.TopBar
+import com.micahnyabuto.statussaver.ui.screens.viewmodel.StatusViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

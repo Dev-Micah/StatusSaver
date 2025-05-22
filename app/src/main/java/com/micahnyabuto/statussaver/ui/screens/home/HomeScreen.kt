@@ -1,6 +1,5 @@
 package com.micahnyabuto.statussaver.ui.screens.home
 
-import StatusViewModel
 import android.net.Uri
 import android.widget.VideoView
 import androidx.compose.foundation.Image
@@ -62,6 +61,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.micahnyabuto.statussaver.data.local.StatusEntity
 import com.micahnyabuto.statussaver.ui.components.PermissionHandler
 import com.micahnyabuto.statussaver.ui.navigation.Destinations
+import com.micahnyabuto.statussaver.ui.screens.viewmodel.StatusViewModel
 import com.micahnyabuto.statussaver.ui.theme.PrimaryLightColor
 import com.micahnyabuto.statussaver.ui.theme.SecondaryColor
 import java.io.File
