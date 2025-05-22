@@ -26,8 +26,8 @@ class StatusViewModel @Inject constructor(
     private val _savedStatuses = MutableStateFlow<List<StatusEntity>>(emptyList())
     val savedStatuses: StateFlow<List<StatusEntity>> = _savedStatuses.asStateFlow()
 
-    private val _loadingState = MutableStateFlow<LoadingState>(LoadingState.Idle)
-    val loadingState: StateFlow<LoadingState> = _loadingState.asStateFlow()
+    private val _loadingState = MutableStateFlow<UiState>(UiState.Loading)
+    val loadingState: StateFlow<UiState> = _loadingState.asStateFlow()
 
     init {
         observeSavedStatuses()
@@ -37,14 +37,14 @@ class StatusViewModel @Inject constructor(
 
     fun loadStatusesFromStorage() {
         viewModelScope.launch {
-            _loadingState.value = LoadingState.Loading
+            _loadingState.value = UiState.Loading
             try {
                 val statuses = statusRepository.fetchStatusesFromStorage()
                 _imageStatuses.value = statuses.filter { it.fileType == "image" }
                 _videoStatuses.value = statuses.filter { it.fileType == "video" }
-                _loadingState.value = LoadingState.Success
+                _loadingState.value = UiState.Success
             } catch (e: Exception) {
-                _loadingState.value = LoadingState.Error(e.message ?: "Unknown error")
+                _loadingState.value = UiState.Error(e.message ?: "Unknown error")
             }
         }
     }
@@ -54,7 +54,7 @@ class StatusViewModel @Inject constructor(
             .onEach { statuses ->
                 _savedStatuses.update { statuses }
             }.catch { e ->
-                _loadingState.value = LoadingState.Error(e.message ?: "Error loading saved statuses")
+                _loadingState.value = UiState.Error(e.message ?: "Error loading saved statuses")
             }
             .launchIn(viewModelScope)
     }
@@ -64,7 +64,7 @@ class StatusViewModel @Inject constructor(
             try {
                 statusRepository.saveStatus(status)
             } catch (e: Exception) {
-                _loadingState.value = LoadingState.Error(e.message ?: "Error saving status")
+                _loadingState.value = UiState.Error(e.message ?: "Error saving status")
             }
         }
     }
@@ -92,9 +92,8 @@ class StatusViewModel @Inject constructor(
 
 }
 
-sealed class LoadingState {
-    object Idle : LoadingState()
-    object Loading : LoadingState()
-    object Success : LoadingState()
-    data class Error(val message: String) : LoadingState()
+sealed class UiState {
+    object Loading : UiState()
+    object Success : UiState()
+    data class Error(val message: String) : UiState()
 }
