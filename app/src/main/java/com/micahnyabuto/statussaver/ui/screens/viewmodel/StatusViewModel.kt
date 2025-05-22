@@ -1,3 +1,5 @@
+package com.micahnyabuto.statussaver.ui.viewmodel
+
 import android.content.Context
 import android.media.MediaScannerConnection
 import androidx.lifecycle.ViewModel

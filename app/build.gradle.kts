@@ -69,9 +69,8 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
 
-
     //App compat
-    implementation("androidx.appcompat:appcompat:1.7.0") // Latest stable version
+    implementation("androidx.appcompat:appcompat:1.7.0")
 
 
     //Room
@@ -85,20 +84,15 @@ dependencies {
     ksp("androidx.hilt:hilt-compiler:1.2.0")
 
 
-
-
-
-
+    //coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
+    //Viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
     // JSON serialization library, works with the Kotlin serialization plugin
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
-
-
-
 
 
     //coil
