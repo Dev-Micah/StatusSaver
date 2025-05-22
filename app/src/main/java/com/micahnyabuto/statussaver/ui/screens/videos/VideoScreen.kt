@@ -18,7 +18,11 @@ import androidx.navigation.NavController
 import com.micahnyabuto.statussaver.ui.components.PermissionHandler
 import com.micahnyabuto.statussaver.ui.screens.home.StatusItem
 import com.micahnyabuto.statussaver.ui.screens.home.TopBar
+<<<<<<< HEAD
 import com.micahnyabuto.statussaver.ui.viewmodel.StatusViewModel
+=======
+import com.micahnyabuto.statussaver.ui.screens.viewmodel.StatusViewModel
+>>>>>>> 9bb36235ce0dee77733dcc94a50b483f6d73c33f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

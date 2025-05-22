@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 package com.micahnyabuto.statussaver.ui.viewmodel
 
+=======
+package com.micahnyabuto.statussaver.ui.screens.viewmodel
+>>>>>>> 9bb36235ce0dee77733dcc94a50b483f6d73c33f
 import android.content.Context
 import android.media.MediaScannerConnection
 import androidx.lifecycle.ViewModel
