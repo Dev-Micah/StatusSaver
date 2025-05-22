@@ -17,6 +17,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
     @Singleton
     @Provides
     fun provideStatusDatabase(@ApplicationContext context: Context): StatusDatabase{
@@ -26,9 +27,13 @@ object AppModule {
             "status_db"
         ).build()
     }
+    @Singleton
+    @Provides
     fun provideStatusDao(database: StatusDatabase): StatusDao{
         return database.statusDao()
     }
+    @Singleton
+    @Provides
     fun provideStatusRepository(
         statusDao: StatusDao,
         @ApplicationContext context: Context
@@ -40,6 +45,7 @@ object AppModule {
             ioDispatcher = Dispatchers.IO
         )
     }
+    @Singleton
     @Provides
     fun provideIoDispatcher() = Dispatchers.IO
 }

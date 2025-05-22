@@ -42,7 +42,9 @@ import com.micahnyabuto.statussaver.ui.navigation.Destinations
 import com.micahnyabuto.statussaver.ui.screens.home.HomeScreen
 import com.micahnyabuto.statussaver.ui.screens.splash.SplashScreen
 import com.micahnyabuto.statussaver.ui.theme.StatusSaverTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
