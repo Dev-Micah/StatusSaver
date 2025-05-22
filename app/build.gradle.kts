@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     //id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
-    id("com.google.devtools.ksp") version "2.1.20-2.0.0"
+//    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
 
 }
@@ -78,11 +78,12 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.0")
     implementation("androidx.room:room-ktx:2.7.0")
     ksp("androidx.room:room-compiler:2.7.0")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51")
     ksp("com.google.dagger:hilt-compiler:2.56.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    ksp("androidx.hilt:hilt-compiler:1.2.0")
+//    ksp("androidx.hilt:hilt-compiler:1.2.0")
 
 
 
