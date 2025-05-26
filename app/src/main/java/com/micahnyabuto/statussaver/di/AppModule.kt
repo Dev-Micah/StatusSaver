@@ -38,9 +38,8 @@ object AppModule {
 
     ): StatusRepository{
         return StatusRepositoryImpl(
-            statusDao = statusDao,
+            dao = statusDao,
             context = context,
-            ioDispatcher = Dispatchers.IO
         )
     }
     @Singleton
