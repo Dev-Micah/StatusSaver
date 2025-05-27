@@ -1,90 +1,90 @@
 package com.micahnyabuto.statussaver.data.repository
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import androidx.core.content.edit
+import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import com.micahnyabuto.statussaver.data.local.StatusDao
 import com.micahnyabuto.statussaver.data.local.StatusEntity
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import java.io.File
-import androidx.core.net.toUri
+import javax.inject.Inject
 
 interface StatusRepository {
     suspend fun fetchStatusesFromStorage(): List<StatusEntity>
     suspend fun saveStatus(status: StatusEntity)
     fun getAllSavedStatus(): Flow<List<StatusEntity>>
+    fun saveSafUri(uri: Uri)
 }
 
-class StatusRepositoryImpl(
-    private val statusDao: StatusDao,
+class StatusRepositoryImpl @Inject constructor(
     private val context: Context,
-    private val ioDispatcher: CoroutineDispatcher
-): StatusRepository {
+    private val dao: StatusDao
+) : StatusRepository {
+
     override suspend fun fetchStatusesFromStorage(): List<StatusEntity> {
-        return withContext(ioDispatcher) {
-            val statuses = mutableListOf<StatusEntity>()
-
-            val statusDirs = listOf(
-                "/storage/emulated/0/WhatsApp/Media/.Statuses",
-                "/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/.Statuses",
-                "/storage/emulated/0/Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses"
-            )
-
-            for (path in statusDirs) {
-                val statusDir = File(path)
-                if (statusDir.exists()) {
-                    statusDir.listFiles()?.forEach { file ->
-                        val fileType = when {
-                            file.name.endsWith(".jpg", true) || file.name.endsWith(
-                                ".png",
-                                true
-                            ) -> "image"
-
-                            file.name.endsWith(".mp4", true) -> "video"
-                            else -> "unknown"
-                        }
-
-                        if (fileType != "unknown") {
-                            statuses.add(
-                                StatusEntity(
-                                    filePath = file.absolutePath,
-                                    fileType = fileType,
-                                    dateSaved = file.lastModified()
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-            statuses
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            fetchStatusesFromSAF()
+        } else {
+            fetchStatusesFromLegacyStorage()
         }
     }
 
+    private fun fetchStatusesFromLegacyStorage(): List<StatusEntity> {
+        val statusDir = File(
+            Environment.getExternalStorageDirectory(),
+            "WhatsApp/Media/.Statuses"
+        )
 
-    override fun getAllSavedStatus(): Flow<List<StatusEntity>> {
-        return statusDao.getAllStatuses()
+        if (!statusDir.exists() || !statusDir.isDirectory) return emptyList()
+
+        return statusDir.listFiles()
+            ?.filter { it.name.endsWith(".jpg") || it.name.endsWith(".mp4") }
+            ?.map { file ->
+                StatusEntity(
+                    filePath = file.absolutePath,
+                    fileType = if (file.name.endsWith(".mp4")) "video" else "image",
+                    dateSaved = file.lastModified()
+                )
+            } ?: emptyList()
+    }
+
+    private fun fetchStatusesFromSAF(): List<StatusEntity> {
+        val prefs = context.getSharedPreferences("status_prefs", Context.MODE_PRIVATE)
+        val uriString = prefs.getString("saf_uri", null) ?: return emptyList()
+        val safUri = uriString.toUri()
+        val documentFile = DocumentFile.fromTreeUri(context, safUri) ?: return emptyList()
+
+        return documentFile.listFiles()
+            .filter { it.name?.endsWith(".jpg") == true || it.name?.endsWith(".mp4") == true }
+            .mapNotNull { file ->
+                StatusEntity(
+                    filePath = file.uri.toString(),
+                    fileType = if (file.name?.endsWith(".mp4") == true) "video" else "image",
+                    dateSaved = file.lastModified()
+                )
+            }
     }
 
     override suspend fun saveStatus(status: StatusEntity) {
-        withContext(ioDispatcher) {
-            val inputUri = status.filePath.toUri()
-            val inputStream = context.contentResolver.openInputStream(inputUri)
+        dao.insertStatus(status)
+    }
 
-            val fileName = File(inputUri.path ?: "status").name
-            val saveDir = File(context.getExternalFilesDir(null), "SavedStatuses")
-            if (!saveDir.exists()) saveDir.mkdirs()
+    override fun getAllSavedStatus(): Flow<List<StatusEntity>> {
+        return dao.getAllStatuses()
+    }
 
-            val outputFile = File(saveDir, fileName)
-            inputStream?.use { input ->
-                outputFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-
-            val savedEntity = status.copy(filePath = outputFile.absolutePath)
-            statusDao.insertStatus(savedEntity)
+    override fun saveSafUri(uri: Uri) {
+        context.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        )
+        context.getSharedPreferences("status_prefs", Context.MODE_PRIVATE).edit {
+            putString("saf_uri", uri.toString())
         }
-
     }
 }
