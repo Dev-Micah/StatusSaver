@@ -1,78 +1,121 @@
-
-
 package com.micahnyabuto.statussaver.ui.screens.viewmodel
+
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.micahnyabuto.statussaver.data.datastore.StatusPreferences
 import com.micahnyabuto.statussaver.data.local.StatusEntity
 import com.micahnyabuto.statussaver.data.repository.StatusRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StatusViewModel @Inject constructor(
     private val statusRepository: StatusRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
-
-    private val _imageStatuses = MutableStateFlow<List<StatusEntity>>(emptyList())
-    val imageStatuses: StateFlow<List<StatusEntity>> = _imageStatuses.asStateFlow()
-
-    private val _videoStatuses = MutableStateFlow<List<StatusEntity>>(emptyList())
-    val videoStatuses: StateFlow<List<StatusEntity>> = _videoStatuses.asStateFlow()
-
-    private val _safUri = MutableStateFlow<Uri?>(null)
-    val safUri: StateFlow<Uri?> = _safUri
-
 
     private val _statuses = MutableStateFlow<List<StatusEntity>>(emptyList())
     val statuses: StateFlow<List<StatusEntity>> = _statuses.asStateFlow()
 
+    private val _needsFolderPermission = MutableStateFlow(true)
+    val needsFolderPermission: StateFlow<Boolean> = _needsFolderPermission.asStateFlow()
 
-    private val _folderUri = MutableStateFlow<Uri?>(null)
-    val folderUri: StateFlow<Uri?> = _folderUri
+    private val _downloadProgress = MutableStateFlow<Map<String, Float>>(emptyMap())
+    val downloadProgress: StateFlow<Map<String, Float>> = _downloadProgress.asStateFlow()
 
-    fun setFolderUri(uri: Uri) {
-        _folderUri.value = uri
-    }
+    val imageStatuses = statuses.map { list ->
+        list.filter { it.fileType == "image" }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    val videoStatuses = statuses.map { list ->
+        list.filter { it.fileType == "video" }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    // Loads statuses from device storage (SAF or legacy)
-    fun loadStatusesFromStorage() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = statusRepository.fetchStatusesFromStorage()
-            _statuses.value = result
-        }
-    }
-
-    // Get saved statuses from Room DB as Flow (e.g. for Saved screen)
     val savedStatuses = statusRepository.getAllSavedStatus()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    // Save SAF Uri persistently (call from folder picker)
-    fun saveSafUri(uri: Uri) {
-        _safUri.value =uri
-
+    init {
+        checkFolderPermissions()
     }
 
-    // Save a status entity to DB
-    fun saveStatus(status: StatusEntity) {
-        viewModelScope.launch(Dispatchers.IO) {
-            statusRepository.saveStatus(status)
+    private fun checkFolderPermissions() {
+        viewModelScope.launch {
+            val hasWhatsAppUri = StatusPreferences.getWhatsAppUri(context).firstOrNull() != null
+            val hasBusinessUri = StatusPreferences.getWhatsAppBusinessUri(context).firstOrNull() != null
+            _needsFolderPermission.value = !hasWhatsAppUri && !hasBusinessUri
+
+            if (!_needsFolderPermission.value) {
+                loadStatusesFromStorage()
+            }
         }
     }
 
-}
+    fun loadStatusesFromStorage() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = statusRepository.fetchStatusesFromStorage()
+                _statuses.value = result
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showNotification("Error loading statuses")
+            }
+        }
+    }
 
-sealed class UiState {
-    object Loading : UiState()
-    object Success : UiState()
-    data class Error(val message: String) : UiState()
+    suspend fun saveSafUri(uri: Uri) {
+        statusRepository.saveSafUri(uri)
+        checkFolderPermissions()
+    }
+
+    fun saveStatus(status: StatusEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                updateDownloadProgress(status.filePath, 0f)
+                val savedFile = statusRepository.copyStatusToLocal(status) { progress ->
+                    updateDownloadProgress(status.filePath, progress)
+                }
+                val savedStatus = status.copy(filePath = savedFile.absolutePath)
+                statusRepository.saveStatus(savedStatus)
+                showNotification("Status saved successfully")
+                updateDownloadProgress(status.filePath, null)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showNotification("Failed to save status")
+                updateDownloadProgress(status.filePath, null)
+            }
+        }
+    }
+
+    fun deleteStatus(status: StatusEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                statusRepository.deleteStatus(status)
+                showNotification("Status deleted successfully")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showNotification("Failed to delete status")
+            }
+        }
+    }
+
+    private fun updateDownloadProgress(filePath: String, progress: Float?) {
+        _downloadProgress.value = if (progress == null) {
+            _downloadProgress.value - filePath
+        } else {
+            _downloadProgress.value + (filePath to progress)
+        }
+    }
+
+    private fun showNotification(message: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 }
