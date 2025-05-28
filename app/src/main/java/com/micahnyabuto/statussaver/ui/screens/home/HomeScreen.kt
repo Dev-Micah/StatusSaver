@@ -5,6 +5,7 @@ import android.widget.VideoView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -49,49 +51,85 @@ import coil.compose.rememberAsyncImagePainter
 import com.micahnyabuto.statussaver.data.local.StatusEntity
 import com.micahnyabuto.statussaver.ui.navigation.Destinations
 import com.micahnyabuto.statussaver.ui.screens.viewmodel.StatusViewModel
+import androidx.core.net.toUri
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: StatusViewModel =hiltViewModel()
 ){
     val statuses by viewModel.statuses.collectAsState()
-    TopBar(
-        navController = navController
-    )
-    LaunchedEffect(Unit) {
-        viewModel.loadStatusesFromStorage()
-    }
-
-
-    if (statuses.isEmpty()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Loading statuses...")
-        }
-    } else {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // 2 columns
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(statuses) { status ->
-                StatusItem(status = status, onDownloadClick = {
-                    viewModel.saveStatus(status)
-                })
+    Scaffold(
+        topBar = {
+            Column(
+                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+            ) {
+                TopAppBar(
+                    title = { Text("Status Saver - Videos") },
+                    actions = {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "notifications"
+                            )
+                        }
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share App"
+                            )
+                        }
+                    },
+                    colors = TopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White,
+                        scrolledContainerColor = Color.White
+                    )
+                )
+                CategoriesBar(navController = navController)
             }
         }
-    }
+    ) { innerpadding ->
+        LaunchedEffect(Unit) {
+            viewModel.loadStatusesFromStorage()
+        }
 
+
+        if (statuses.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator()
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Loading...")
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2), // 2 columns
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerpadding),
+
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(statuses) { status ->
+                    StatusItem(
+                        status = status,
+                        downloadProgress = viewModel.downloadProgress.collectAsState().value[status.filePath],
+                        onDownloadClick = {
+                            viewModel.saveStatus(status)
+                        })
+                }
+            }
+        }
+
+    }
 }
 
 @Composable
@@ -127,7 +165,7 @@ fun CategoriesBar(
 @Composable
 fun StatusItem(
     status: StatusEntity,
-    viewModel: StatusViewModel=hiltViewModel(),
+    downloadProgress: Float?,
     onDownloadClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -143,81 +181,38 @@ fun StatusItem(
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
+                        .height(150.dp)
                 )
             } else {
-                AndroidView(
-                    factory = { context ->
-                        VideoView(context).apply {
-                            setVideoURI(Uri.parse(status.filePath))
-                            setOnPreparedListener { it.isLooping = true; start() }
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                )
+                Box(Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center)
+                {
+                    Text("Failed to load")
+
+                }
+
             }
 
-            IconButton(
-                onClick = {  },
-                modifier = Modifier.align(Alignment.End)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             ) {
-                Icon(Icons.Default.Download, contentDescription = "Download")
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar(
-    navController: NavController
-){
-    Scaffold (
-
-        topBar = {
-            Column (
-                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-
-
-            ){
-                TopAppBar(
-                    title = { Text("Status Saver") },
-
-                    actions = {
-                        IconButton(
-                            onClick = {}
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
-                            )
-                        }
-                        IconButton(onClick = {}) {
-                            Icon(
-                                imageVector = Icons.Default.Share,
-                                contentDescription = "Share App"
-                            )
-                        }
-                    },
-                    colors = TopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = White,
-                        navigationIconContentColor = White,
-                        actionIconContentColor = White,
-                        scrolledContainerColor = White
+                if (downloadProgress != null) {
+                    LinearProgressIndicator(
+                        progress = downloadProgress,
+                        modifier = Modifier.fillMaxWidth()
                     )
-                )
-                CategoriesBar(
-                    navController = navController
-                )
+                } else {
+                    IconButton(
+                        onClick = onDownloadClick,
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Icon(Icons.Default.Download, contentDescription = "Download")
+                    }
+                }
             }
-
         }
-    ){ innerpadding ->
-
-
-
     }
 }
+
