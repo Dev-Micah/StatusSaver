@@ -6,25 +6,26 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.util.Log
+import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import com.micahnyabuto.statussaver.data.datastore.StatusPreferences
 import com.micahnyabuto.statussaver.data.local.StatusDao
 import com.micahnyabuto.statussaver.data.local.StatusEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import java.io.File
 import javax.inject.Inject
 
+// Interface definition
 interface StatusRepository {
     suspend fun fetchStatusesFromStorage(): List<StatusEntity>
     suspend fun saveStatus(status: StatusEntity)
     fun getAllSavedStatus(): Flow<List<StatusEntity>>
-    suspend fun saveSafUri(uri: Uri)
+    fun saveSafUri(uri: Uri)
     suspend fun copyStatusToLocal(status: StatusEntity, progressCallback: (Float) -> Unit): File
     suspend fun deleteStatus(status: StatusEntity)
 }
 
+// Implementation class
 class StatusRepositoryImpl @Inject constructor(
     private val context: Context,
     private val dao: StatusDao
@@ -33,12 +34,11 @@ class StatusRepositoryImpl @Inject constructor(
     override suspend fun fetchStatusesFromStorage(): List<StatusEntity> {
         val allStatuses = mutableListOf<StatusEntity>()
 
-        /*
-        legacy storage first
-        */
+        // Try legacy storage first
         val legacyStatuses = fetchStatusesFromLegacyStorage()
         allStatuses.addAll(legacyStatuses)
 
+        // Try SAF storage if available
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val safStatuses = fetchStatusesFromSAF()
             // Add only unique statuses from SAF
@@ -84,11 +84,14 @@ class StatusRepositoryImpl @Inject constructor(
             }
     }
 
-    private suspend fun fetchStatusesFromSAF(): List<StatusEntity> {
-        val whatsAppUri = StatusPreferences.getWhatsAppUri(context).firstOrNull()?.toUri()
-        val businessUri = StatusPreferences.getWhatsAppBusinessUri(context).firstOrNull()?.toUri()
+    private fun fetchStatusesFromSAF(): List<StatusEntity> {
+        val prefs = context.getSharedPreferences("status_prefs", Context.MODE_PRIVATE)
+        val uris = listOfNotNull(
+            prefs.getString("whatsapp_saf_uri", null)?.toUri(),
+            prefs.getString("whatsapp_business_saf_uri", null)?.toUri()
+        )
 
-        return listOfNotNull(whatsAppUri, businessUri).flatMap { uri ->
+        return uris.flatMap { uri ->
             try {
                 val documentFile = DocumentFile.fromTreeUri(context, uri) ?: return@flatMap emptyList()
 
@@ -115,7 +118,7 @@ class StatusRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveSafUri(uri: Uri) {
+    override fun saveSafUri(uri: Uri) {
         try {
             context.contentResolver.takePersistableUriPermission(
                 uri,
@@ -125,16 +128,17 @@ class StatusRepositoryImpl @Inject constructor(
             val isWhatsAppBusiness = uri.path?.contains("whatsapp.w4b") == true ||
                     uri.path?.contains("WhatsApp Business") == true
 
-            if (isWhatsAppBusiness) {
-                StatusPreferences.saveWhatsAppBusinessUri(context, uri.toString())
-            } else {
-                StatusPreferences.saveWhatsAppUri(context, uri.toString())
+            context.getSharedPreferences("status_prefs", Context.MODE_PRIVATE).edit {
+                if (isWhatsAppBusiness) {
+                    putString("whatsapp_business_saf_uri", uri.toString())
+                } else {
+                    putString("whatsapp_saf_uri", uri.toString())
+                }
             }
         } catch (e: Exception) {
             Log.e("StatusRepository", "Error saving SAF URI", e)
         }
     }
-
     override suspend fun copyStatusToLocal(status: StatusEntity, progressCallback: (Float) -> Unit): File {
         val sourceUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             status.filePath.toUri()
