@@ -83,11 +83,11 @@ class StatusViewModel @Inject constructor(
                 }
                 val savedStatus = status.copy(filePath = savedFile.absolutePath)
                 statusRepository.saveStatus(savedStatus)
-                showNotification("Status saved successfully")
+                showNotification("Saved successfully")
                 updateDownloadProgress(status.filePath, null)
             } catch (e: Exception) {
                 e.printStackTrace()
-                showNotification("Failed to save status")
+                showNotification("Failed to save")
                 updateDownloadProgress(status.filePath, null)
             }
         }
@@ -97,10 +97,10 @@ class StatusViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 statusRepository.deleteStatus(status)
-                showNotification("Status deleted successfully")
+                showNotification("Deleted successfully")
             } catch (e: Exception) {
                 e.printStackTrace()
-                showNotification("Failed to delete status")
+                showNotification("Failed to delete ")
             }
         }
     }
