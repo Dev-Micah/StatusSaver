@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import java.io.File
 import javax.inject.Inject
 
-// Interface definition
 interface StatusRepository {
     suspend fun fetchStatusesFromStorage(): List<StatusEntity>
     suspend fun saveStatus(status: StatusEntity)
@@ -25,7 +24,7 @@ interface StatusRepository {
     suspend fun deleteStatus(status: StatusEntity)
 }
 
-// Implementation class
+
 class StatusRepositoryImpl @Inject constructor(
     private val context: Context,
     private val dao: StatusDao
@@ -34,14 +33,14 @@ class StatusRepositoryImpl @Inject constructor(
     override suspend fun fetchStatusesFromStorage(): List<StatusEntity> {
         val allStatuses = mutableListOf<StatusEntity>()
 
-        // Try legacy storage first
+        // Legacy storage
         val legacyStatuses = fetchStatusesFromLegacyStorage()
         allStatuses.addAll(legacyStatuses)
 
-        // Try SAF storage if available
+        //  SAF storage
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val safStatuses = fetchStatusesFromSAF()
-            // Add only unique statuses from SAF
+            // Add statuses from SAF
             safStatuses.forEach { safStatus ->
                 if (!allStatuses.any { it.filePath == safStatus.filePath }) {
                     allStatuses.add(safStatus)
