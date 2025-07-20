@@ -20,4 +20,7 @@ sealed class Destinations {
 
     @Serializable
     object Splash
+
+    @Serializable
+    object Main
 }
