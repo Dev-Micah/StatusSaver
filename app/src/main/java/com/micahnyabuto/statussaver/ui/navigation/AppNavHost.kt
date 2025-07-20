@@ -5,12 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.micahnyabuto.statussaver.ui.screens.home.HomeScreen
-import com.micahnyabuto.statussaver.ui.screens.saved.SavedScreen
-import com.micahnyabuto.statussaver.ui.screens.settings.SettingsScreen
 import com.micahnyabuto.statussaver.ui.screens.splash.SplashScreen
-import com.micahnyabuto.statussaver.ui.screens.videos.VideoScreen
 
 @Composable
 fun AppNavHost(
@@ -24,35 +19,11 @@ fun AppNavHost(
         startDestination = Destinations.Splash
     ) {
         composable <Destinations.Splash>{
-            SplashScreen(
-                onSplashFinished = {
-                    navController.navigate(Destinations.Home){
-                        popUpTo(Destinations.Splash){
-                            inclusive =true
-                        }
-                    }
-                }
-            )
+            SplashScreen(navController = navController)
         }
-        composable <Destinations.Home>{
-            HomeScreen(
-                navController =navController
-            )
+        composable <Destinations.Main>{
+            MainNavGraph()
         }
-        composable <Destinations.Saved>{
-            SavedScreen(
-                navController =navController
-            )
-        }
-        composable <Destinations.Settings>{
-            SettingsScreen(
-                navController =navController
-            )
-        }
-        composable <Destinations.Videos>{
-            VideoScreen(
-                navController =navController
-            )
-        }
+
     }
 }
