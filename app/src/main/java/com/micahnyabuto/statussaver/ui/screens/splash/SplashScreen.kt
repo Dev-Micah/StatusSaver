@@ -17,21 +17,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.micahnyabuto.statussaver.R
+import com.micahnyabuto.statussaver.ui.navigation.Destinations
 import com.micahnyabuto.statussaver.ui.theme.SecondaryColor
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onSplashFinished: () -> Unit
+    navController: NavController
 ){
     LaunchedEffect(Unit) {
         delay(2000)
-        onSplashFinished()
+        navController.navigate(Destinations.Main){
+            popUpTo(Destinations.Splash){
+                inclusive =true
+            }
+        }
     }
     Box(
         modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary),
+            .background(Color(0xFF075E54)),
         contentAlignment = Alignment.Center
     ){
         Image(
