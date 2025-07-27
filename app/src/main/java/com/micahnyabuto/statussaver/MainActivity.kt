@@ -38,10 +38,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val navController= rememberNavController()
-            AppNavHost(
-                            navController = navController
-                        )
+            AppNavHost()
 
                 }
             }
