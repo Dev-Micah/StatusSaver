@@ -134,7 +134,7 @@ fun CategoriesBar(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = {navController.navigate(Destinations.Home)},
+        TextButton(onClick = {navController.navigate(Destinations.Home.route)},
             shape = RoundedCornerShape(2.dp)
         ) {
             Text("IMAGES",
@@ -142,7 +142,7 @@ fun CategoriesBar(
                     Color.White
                 ))
         }
-        TextButton(onClick = {navController.navigate(Destinations.Videos)},
+        TextButton(onClick = {navController.navigate(Destinations.Videos.route)},
             shape = RoundedCornerShape(2.dp)) {
             Text("VIDEOS",
                 style = MaterialTheme.typography.bodyLarge.copy(
