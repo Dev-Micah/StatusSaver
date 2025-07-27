@@ -16,19 +16,25 @@
 
 ---
 
-## Tech Stack 
+## Tech Stack
 
-| Tech / Library        
-|-----------------------|-------------|
-| **Kotlin**            | A modern, expressive, and safe programming language for Android development. |
-| **Jetpack Compose**   | Android's modern UI toolkit for building declarative, reactive UIs with less code. |
-| **MVVM Architecture** | Separates UI logic, business logic, and data for clean and testable architecture. |
-| **Hilt (DI)**         | A dependency injection library that simplifies injecting and managing dependencies like ViewModels and repositories. |
-| **Storage Access Framework (SAF)** | Allows users to grant access to specific folders (like `.Statuses`) while respecting Android 10+ Scoped Storage restrictions. |
-| **ExoPlayer**         | A powerful media player library for video playback within the app. |
-| **Coil**              | An image loading library optimized for Kotlin and Jetpack Compose. |
-| **Navigation Compose**| Manages screen-to-screen navigation using a simple and type-safe route system. |
-| **StateFlow + Coroutines** | Used to handle UI state and asynchronous data loading cleanly and reactively. |
+Kotlin – A modern, concise, and type-safe programming language for Android development.
+
+Jetpack Compose – Android’s declarative UI toolkit for building native interfaces faster with less boilerplate.
+
+MVVM Architecture – Separates business logic from UI for clean, testable, and maintainable code.
+
+Hilt (Dependency Injection) – Simplifies dependency injection and reduces boilerplate in managing ViewModels and repositories.
+
+Storage Access Framework (SAF) – Enables safe access to user-selected folders (like WhatsApp .Statuses) in Android 10+.
+
+ExoPlayer – A robust and customizable media player library used to preview video statuses.
+
+Coil – A lightweight and fast Kotlin-first image loading library designed for Jetpack Compose.
+
+Navigation Compose – Handles screen navigation in a simple, declarative, and type-safe way.
+
+StateFlow + Coroutines – Used for managing UI state reactively and performing asynchronous operations smoothly.
 
 ---
 
