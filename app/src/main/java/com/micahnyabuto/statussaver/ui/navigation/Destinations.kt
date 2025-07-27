@@ -1,26 +1,23 @@
 package com.micahnyabuto.statussaver.ui.navigation
 
-import kotlinx.serialization.Serializable
+sealed class Destinations(val route: String) {
 
-sealed class Destinations {
-    @Serializable
-    object Home
+    object Home: Destinations("home")
 
-    @Serializable
-    object Saved
 
-    @Serializable
-    object Settings
+    object Saved: Destinations("saved")
 
-    @Serializable
-    object Images
 
-    @Serializable
-    object Videos
+    object Settings: Destinations("settings")
 
-    @Serializable
-    object Splash
+    object Images: Destinations("images")
 
-    @Serializable
-    object Main
+
+    object Videos: Destinations("videos")
+
+
+    object Splash: Destinations("splash")
+
+
+    object Main: Destinations("main")
 }
