@@ -3,6 +3,16 @@
 **StatusSaver** is an Android application built with **Kotlin** and **Jetpack Compose** that enables users to view, save, and manage **WhatsApp statuses** (images and videos) directly from their devices. Designed for performance and simplicity, it uses modern Android tools and patterns to support both older and newer versions of Android — including Scoped Storage and the Storage Access Framework (SAF).
 
 ---
+# ScreenShots
+## 📸 Screenshots
+
+| Splash Screen | Image Screen | Settings Screen | 
+|----------------|-------------|--------------|
+| ![SplashScreen](![Splash](https://github.com/user-attachments/assets/6f7b57c5-bf17-409f-a6f7-26142ebf6d05)
+) | ![Home](![Images](https://github.com/user-attachments/assets/e9521472-61a5-4642-b318-a0a99914a00b)
+) | ![Settings](![Settings](https://github.com/user-attachments/assets/1adbbdbd-aca7-41e0-b69f-285a59f70771)
+) |
+
 
 ## Core Features
 
