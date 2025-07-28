@@ -4,7 +4,7 @@
 
 ---
 # ScreenShots
-## 📸 Screenshots
+
 
 | Splash Screen | Image Screen | Settings Screen | 
 |----------------|-------------|--------------|
