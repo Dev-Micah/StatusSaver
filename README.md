@@ -15,11 +15,26 @@
       <img src="https://github.com/user-attachments/assets/29c182c3-4870-44a4-bb5b-e6fd433081e8" width="250"/>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/a57db240-d719-4180-a9d0-59a1d8efb54c" width="250"/>
+      <img src="https://github.com/user-attachments/assets/061b8e92-fad9-4f6e-8400-e1e4b8f29947" width="250"/>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/436deca0-af13-4960-85d5-13bbf96527b0" width="250"/>
+      <img src="https://github.com/user-attachments/assets/b1b7baa8-8327-44ac-a937-1deee72bbc84" width="250"/>
     </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th>Saved Status Screen</th>
+    <th>Settings Screen</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/4e8f5a06-8915-4018-981e-037b9db826f4" width="250"/>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/d712d58f-2ec2-411f-aea4-6e0165546a79" width="250"/>
+    </td>
+  
   </tr>
 </table>
 ---
