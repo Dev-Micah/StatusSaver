@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -98,8 +99,9 @@ fun VideoScreen(
                 Text("Loading...")
             }
         } else {
+            val videos = videoStatuses.filter { it.fileType == "video" && it.filePath.isNotEmpty() }
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Fixed(3),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
@@ -107,7 +109,7 @@ fun VideoScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(videoStatuses) { status ->
+                items(videos) { status ->
                     VideoStatusItem(
                         status = status,
                         downloadProgress = viewModel.downloadProgress.collectAsState().value[status.filePath],
@@ -127,12 +129,6 @@ fun VideoStatusItem(
     downloadProgress: Float?,
     onDownloadClick: () -> Unit
 ) {
-    val context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
         Column {
             AndroidView(
                 factory = { context ->
@@ -147,11 +143,12 @@ fun VideoStatusItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
+                    .width(150.dp)
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(4.dp)
             ) {
                 if (downloadProgress != null) {
                     LinearProgressIndicator(
@@ -168,5 +165,5 @@ fun VideoStatusItem(
                 }
             }
         }
-    }
+
 }
