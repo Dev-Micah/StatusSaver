@@ -18,14 +18,11 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -53,9 +49,10 @@ import com.micahnyabuto.statussaver.ui.screens.viewmodel.StatusViewModel
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: StatusViewModel =hiltViewModel()
-){
+    viewModel: StatusViewModel = hiltViewModel()
+) {
     val statuses by viewModel.statuses.collectAsState()
+
     Scaffold(
         topBar = {
             Column(
@@ -83,10 +80,10 @@ fun HomeScreen(
             }
         }
     ) { innerpadding ->
+
         LaunchedEffect(Unit) {
             viewModel.loadStatusesFromStorage()
         }
-
 
         if (statuses.isEmpty()) {
             Column(
@@ -99,29 +96,34 @@ fun HomeScreen(
                 Text("Loading...")
             }
         } else {
+            // Filter the list to only include loaded images
+            val loadedStatuses = statuses.filter {
+                it.fileType == "image" && it.filePath.isNotEmpty()
+            }
+
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Fixed(3),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerpadding),
-
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(statuses) { status ->
+
+                items(loadedStatuses) { status ->
                     StatusItem(
                         status = status,
-                        downloadProgress = viewModel.downloadProgress.collectAsState().value[status.filePath],
+                        downloadProgress = viewModel.downloadProgress
+                            .collectAsState().value[status.filePath],
                         onDownloadClick = {
                             viewModel.saveStatus(status)
-                        })
+                        }
+                    )
                 }
             }
         }
-
     }
 }
-
 @Composable
 fun CategoriesBar(
     navController: NavController
@@ -151,60 +153,42 @@ fun CategoriesBar(
         }
     }
 }
-
 @Composable
 fun StatusItem(
     status: StatusEntity,
     downloadProgress: Float?,
     onDownloadClick: () -> Unit
 ) {
-    val context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(4.dp)
-    ) {
-        Column {
-            if (status.fileType == "image") {
-                Image(
-                    painter = rememberAsyncImagePainter(status.filePath),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .width(20.dp)
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
+    Column {
+        Image(
+            painter = rememberAsyncImagePainter(status.filePath),
+            contentDescription = null,
+            modifier = Modifier
+                .width(150.dp)
+                .height(150.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        ) {
+            if (downloadProgress != null) {
+                CircularProgressIndicator(
+                    progress = downloadProgress,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             } else {
-                Box(Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center)
-                {
-                    Text("Failed to load")
-
-                }
-
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                if (downloadProgress != null) {
-                    LinearProgressIndicator(
-                        progress = downloadProgress,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } else {
-                    IconButton(
-                        onClick = onDownloadClick,
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(Icons.Default.Download, contentDescription = "Download")
-                    }
+                IconButton(
+                    onClick = onDownloadClick,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = "Download")
                 }
             }
         }
     }
 }
+
 
