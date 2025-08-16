@@ -10,14 +10,18 @@ sealed class Destinations(val route: String) {
 
     object Settings: Destinations("settings")
 
-    object Images: Destinations("images")
 
 
     object Videos: Destinations("videos")
+
+    object Details: Destinations("details/{statusPath}")
 
 
     object Splash: Destinations("splash")
 
 
     object Main: Destinations("main")
+
+    fun detailsRoute(statusPath: String) = "details/${statusPath}"
+
 }
