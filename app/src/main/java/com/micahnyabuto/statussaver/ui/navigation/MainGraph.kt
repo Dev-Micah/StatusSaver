@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -27,25 +28,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.micahnyabuto.statussaver.ui.components.RequestStoragePermissions
 import com.micahnyabuto.statussaver.ui.screens.home.HomeScreen
 import com.micahnyabuto.statussaver.ui.screens.saved.SavedScreen
 import com.micahnyabuto.statussaver.ui.screens.settings.SettingsScreen
 import com.micahnyabuto.statussaver.ui.screens.settings.SettingsViewModel
+import com.micahnyabuto.statussaver.ui.screens.videos.VideoPlayerScreen
 import com.micahnyabuto.statussaver.ui.screens.videos.VideoScreen
 import com.micahnyabuto.statussaver.ui.screens.viewmodel.StatusViewModel
 import com.micahnyabuto.statussaver.ui.theme.StatusSaverTheme
 import kotlinx.coroutines.launch
+import java.net.URLDecoder
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -163,6 +169,38 @@ fun MainNavGraph(){
                         VideoScreen(
                             navController = navController
                         )
+                    }
+                    // In your NavHost setup, add a composable route for VideoPlayerScreen
+                    composable(
+                        route= Destinations.Details.route,
+                        arguments = listOf(navArgument("statusPath") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        // Decode the path!
+                        val encodedPath = backStackEntry.arguments?.getString("statusPath") ?: ""
+                        val statusPath = URLDecoder.decode(encodedPath, "UTF-8")
+                        val statuses by viewModel.statuses.collectAsState()
+
+                        LaunchedEffect(Unit) {
+                            viewModel.loadStatusesFromStorage()
+                        }
+
+                        // Find by filePath, not fileType
+                        val status = statuses.find { it.filePath == statusPath }
+                        if (status != null) {
+                            VideoPlayerScreen(
+                                statusPath = statusPath, // or status.filePath
+                                onBack = { navController.popBackStack() },
+                                onDownloadClick = { /* implement download logic */ },
+                                onShareClick = { /* implement share logic */ }
+                            )
+                        } else {
+                            Box (
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ){
+                                Text("Couldn't play video")
+                            }
+                        }
                     }
                 }
             }
