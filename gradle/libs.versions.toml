@@ -23,6 +23,7 @@ dataStore = "1.1.7"
 kotlix-serialization = "1.8.0"
 compose-extended-icons = "1.7.8"
 appcompat = "1.7.0"
+runtime = "1.9.0"
 
 
 
@@ -84,6 +85,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 #extended material icons
 adroidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-extended-icons" }
+androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
