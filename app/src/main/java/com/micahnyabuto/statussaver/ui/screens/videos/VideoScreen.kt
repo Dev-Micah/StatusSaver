@@ -3,6 +3,7 @@ package com.micahnyabuto.statussaver.ui.screens.videos
 import android.net.Uri
 import android.widget.VideoView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,9 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +48,13 @@ import androidx.navigation.NavController
 import com.micahnyabuto.statussaver.data.local.StatusEntity
 import com.micahnyabuto.statussaver.ui.screens.home.CategoriesBar
 import com.micahnyabuto.statussaver.ui.screens.viewmodel.StatusViewModel
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.ui.PlayerView
+
 import androidx.core.net.toUri
+import com.micahnyabuto.statussaver.ui.navigation.Destinations
+import java.net.URLEncoder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +63,7 @@ fun VideoScreen(
     viewModel: StatusViewModel = hiltViewModel()
 ) {
     val videoStatuses by viewModel.videoStatuses.collectAsState()
+
 
     Scaffold(
         topBar = {
@@ -116,7 +126,10 @@ fun VideoScreen(
                         onDownloadClick = {
                             viewModel.saveStatus(status)
                         }
-                    )
+                    ){
+                        val encodedPath = URLEncoder.encode(status.filePath, "UTF-8")
+                        navController.navigate(Destinations.Details.detailsRoute(encodedPath))
+                    }
                 }
             }
         }
@@ -127,43 +140,69 @@ fun VideoScreen(
 fun VideoStatusItem(
     status: StatusEntity,
     downloadProgress: Float?,
-    onDownloadClick: () -> Unit
+    onDownloadClick: () -> Unit,
+    onItemClick: () -> Unit
 ) {
-        Column {
-            AndroidView(
-                factory = { context ->
-                    VideoView(context).apply {
-                        setVideoURI(status.filePath.toUri())
-                        setOnPreparedListener { mp ->
-                            mp.isLooping = true
-                            start()
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .width(150.dp)
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                if (downloadProgress != null) {
-                    LinearProgressIndicator(
-                        progress = downloadProgress,
-                        modifier = Modifier.fillMaxWidth()
+    val context = LocalContext.current
+    // Create and remember an ExoPlayer instance for each video item
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(status.filePath))
+            repeatMode = ExoPlayer.REPEAT_MODE_ALL
+            prepare()
+            //playWhenReady = false
+        }
+    }
+
+    // Release ExoPlayer when composable leaves composition
+    DisposableEffect(key1 = status.filePath) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+    Card (
+        modifier = Modifier.clickable{
+            onItemClick()
+        }
+    ){
+
+    Column {
+        AndroidView(
+            factory = { ctx ->
+                PlayerView(ctx).apply {
+                    player = exoPlayer
+                    useController = false // Hide controls if you want
+                    layoutParams = android.view.ViewGroup.LayoutParams(
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT
                     )
-                } else {
-                    IconButton(
-                        onClick = onDownloadClick,
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(Icons.Default.Download, contentDescription = "Download")
-                    }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .width(150.dp)
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        ) {
+            if (downloadProgress != null) {
+                LinearProgressIndicator(
+                    progress = downloadProgress,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                IconButton(
+                    onClick = onDownloadClick,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = "Download")
                 }
             }
         }
+    }
+}
 
 }
